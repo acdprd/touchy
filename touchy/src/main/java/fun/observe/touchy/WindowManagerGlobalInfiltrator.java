@@ -12,24 +12,15 @@ class WindowManagerGlobalInfiltrator {
     static void infiltrate() {
 
         try {
-
             Class classWindowManagerGlobal = Class.forName("android.view.WindowManagerGlobal");
-
             Field mViewsField = classWindowManagerGlobal.getDeclaredField("mViews");
-
             ReflectionUtils.makeFieldNonFinal(mViewsField);
-
             Method getInstanceMethod = classWindowManagerGlobal.getDeclaredMethod("getInstance");
-
             Object windowManagerGlobalObject = getInstanceMethod.invoke(null);
-
             List<View> mViews = new AdHocListForInfiltration();
-
             mViewsField.set(windowManagerGlobalObject, mViews);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }
