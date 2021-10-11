@@ -2,6 +2,7 @@ package fun.observe.touchy;
 
 import android.view.View;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 
 import java.lang.reflect.Field;
@@ -27,7 +28,7 @@ class DecorViewInfiltrator {
         }
 
         try {
-            classPhoneWindow = Class.forName("com.android.internal.policy.PhoneWindow.DecorView");
+            classPhoneWindow = Class.forName("com.android.internal.policy.PhoneWindow$DecorView");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -43,7 +44,7 @@ class DecorViewInfiltrator {
         mWindowObject.setCallback(windowCallbackWrapper);
     }
 
-    private static void useTouchListenerWrapper(Object decorViewObject) throws NoSuchFieldException, IllegalAccessException {
+    private static void useTouchListenerWrapper(Object decorViewObject) throws Exception {
 
         Field this$0Field = classPopupDecorView.getDeclaredField("this$0");
         this$0Field.setAccessible(true);
@@ -56,13 +57,23 @@ class DecorViewInfiltrator {
         mTouchInterceptorField.set(popupWindowObject, onTouchListenerWrapper);
     }
 
+    private static void useTouchListenerWrapperForPhoneDecor(Object decorViewObject) throws Exception {
+
+        Field this$0Field = classPhoneWindow.getDeclaredField("this$0");
+        this$0Field.setAccessible(true);
+        Window mWindowObject = (Window) this$0Field.get(decorViewObject);
+        Window.Callback callback = mWindowObject.getCallback();
+        Window.Callback windowCallbackWrapper = new WindowCallbackWrapper(callback);
+        mWindowObject.setCallback(windowCallbackWrapper);
+    }
+
     static void infiltrateFor(Object objectDecorView) {
 
         try {
             if (classDecorView != null && classDecorView.isInstance(objectDecorView)) {
                 useWindowCallbackWrapper(objectDecorView);
             } else if (classPhoneWindow != null && classPhoneWindow.isInstance(objectDecorView)) {
-                useTouchListenerWrapper(objectDecorView);
+                useTouchListenerWrapperForPhoneDecor(objectDecorView);
             } else if (classPopupDecorView.isInstance(objectDecorView)) {
                 useTouchListenerWrapper(objectDecorView);
             }
@@ -73,7 +84,7 @@ class DecorViewInfiltrator {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-        } catch (Exception e) {
+        } catch (Exception e) {//?
             e.printStackTrace();
         }
     }
