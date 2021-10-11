@@ -3,6 +3,7 @@ package fun.observe.touchy.app;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,7 +29,18 @@ public class MainActivity extends AppCompatActivity {
         };
 
         MotionEventBroadcaster.registerReceiver(this, motionEventReceiver);
+        String cName = getWindow().getDecorView().getClass().getName();
 
+        Log.d(TAG,cName);
+
+
+        getWindow().getDecorView().setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.d(TAG,"ON TOUCH_"+event.toString());
+                return false;
+            }
+        });
     }
 
     @Override
